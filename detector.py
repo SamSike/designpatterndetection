@@ -21,12 +21,15 @@ import logging
 import plyj.parser
 import os
 import sys
-#from convert_format import *
+# from convert_format import *
 from extract_features_callgraph import *
 # from learning import run_train        # Not used at the moment, can be addressed later
 import random
 
-sys.setrecursionlimit(10000) # using a recursion limit to avoid crashing if the huge dataset
+# using a recursion limit to avoid crashing if the huge dataset
+sys.setrecursionlimit(10000)
+
+
 def check_patterns(options):
     '''
     Function to compare patterns with
@@ -73,10 +76,10 @@ def process_dirs(options):
         package_outdir = os.path.join(options.output,
                                       pname)
         check_dir(package_outdir)
-        # Code below makes a copy of the input 
+        # Code below makes a copy of the input
         # check_dir(os.path.join(package_outdir, pattern_type))
-        # invoke_command(['cp', 
-        #     os.path.join(root, fname), 
+        # invoke_command(['cp',
+        #     os.path.join(root, fname),
         #       os.path.join(package_outdir, pattern_type)])
 
 
@@ -99,7 +102,8 @@ if __name__ == '__main__':
                         help='output folder with input \
                      output pair')
     parser.add_argument('--tasks', '-t',
-                        choices=['all', 'store', 'extractfeat', 'test', 'format'],
+                        choices=['all', 'store',
+                                 'extractfeat', 'test', 'format'],
                         nargs='?',  # Accepts a single argument if present
                         default='all',  # If no argument is given, the default value of 'all' is used
                         help='tasks to run')
@@ -129,14 +133,14 @@ if __name__ == '__main__':
     logger = logging.getLogger()
     logger.addHandler(streamHandler)
 
-
     # verify input and output
     if not os.path.isdir(options.input):
         IOError('Invalid input folder %s'
                 % options.input)
     logger.info('Input: %s' % options.input)
 
-    check_dir(options.output)  # Checks if output folder exists: if not, creates one
+    # Checks if output folder exists: if not, creates one
+    check_dir(options.output)
 
     # All output should go to output (commented out code)
     # check_dir(
@@ -180,12 +184,12 @@ if __name__ == '__main__':
         data = extract_features(options.input,
                                 feat_output, parser)  # Changed to options.input
 
-   #format the features into liblinear format
+   # format the features into liblinear format
    # Commented by Najam
-   #if runAll or \
+   # if runAll or \
    #      "format" in options.tasks:
    # labels, vectors = convert_format(feat_output, data)
-       #print labels, vectors
-       #print "len", len(labels), len([x for x in labels if x == -1])
-      #  run_train(vectors, labels)                     # Not being used 
-       #print "Format converted\n"
+       # print labels, vectors
+       # print "len", len(labels), len([x for x in labels if x == -1])
+      #  run_train(vectors, labels)                     # Not being used
+       # print "Format converted\n"

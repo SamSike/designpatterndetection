@@ -10,22 +10,22 @@ import os
 import plyj.model as m
 from collections import defaultdict
 
+
 class Callgraph:
-    #builds call graph linking functions
-    #based on method invocations and declarations
+    # builds call graph linking functions
+    # based on method invocations and declarations
     def __init__(self, tree):
         self.tree = tree
         # print "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
         # print tree        # Used for debugging
         # print "-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
-        self.graph = {'in': defaultdict(set)
-                       , 'out': defaultdict(set)}
+        self.graph = {'in': defaultdict(set), 'out': defaultdict(set)}
         self.nodes = []
         self._from_tree()
 
     def _from_tree(self):
         if not self.tree:
-           return
+            return
         for type_decl in self.tree.type_declarations:
             if not hasattr(type_decl, 'body'):
                 continue
@@ -40,16 +40,17 @@ class Callgraph:
     @classmethod
     def from_file(cls, filename, parser):
         tree = parser.parse_file(
-                    filename)
-        #print "Received tree ", tree
+            filename)
+        # print "Received tree ", tree
         return Callgraph(tree)
 
-class Node:
-    #stores class information
 
-    def __init__(self, 
-           name, return_val, params, 
-             methods, statement_types):
+class Node:
+    # stores class information
+
+    def __init__(self,
+                 name, return_val, params,
+                 methods, statement_types):
         self.name = name
         self.return_val = return_val
         self.params = params
@@ -72,27 +73,26 @@ class Node:
                     self.links.add(mm[1])
                 else:
                     self.links.add(mm)
-                         
 
     @classmethod
-    def from_obj(cls, method_decl): 
+    def from_obj(cls, method_decl):
         name = method_decl.name
         return_val = cls.handle_return_type(
-                       method_decl)
+            method_decl)
         params = cls.handle_params(method_decl)
         methods, statement_types = \
-                cls.handle_body(method_decl)
+            cls.handle_body(method_decl)
         return Node(name, return_val,
-                     params, methods, 
-                       statement_types)
+                    params, methods,
+                    statement_types)
 
     @classmethod
     def handle_return_type(cls, method_decl):
         return_val = None
         if method_decl.return_type \
            is not None:
-            return_val = obj_handler( 
-                         method_decl.return_type)
+            return_val = obj_handler(
+                method_decl.return_type)
         return return_val
 
     @classmethod
@@ -114,59 +114,59 @@ class Node:
     def handle_body(cls, method_decl):
         if method_decl.body is None:
             return [], []
-        methods = [] #track function calls
+        methods = []  # track function calls
         statement_types = []
-        
+
         function_handling = {
-            m.ClassInitializer : cls.cls_init,
-            m.VariableDeclaration : \
-                   cls.var_decl,
-            m.Conditional: \
-                   cls.condition_decl,
-            m.Block: \
-                   cls.block_decl,
-            m.ArrayInitializer: \
-                   cls.array_decl,
-            m.MethodInvocation: \
-                   cls.method_invoc,
-            m.IfThenElse : \
-                   cls.cond_decl,
-            m.While: \
-                   cls.loop_decl,
-            m.For: \
-                   cls.loop_decl,
-            m.ForEach : \
-                   cls.loop_decl,
-            m.Switch: \
-                   cls.switch_decl,
-            m.SwitchCase: \
-                   cls.switch_decl,
-            m.DoWhile: \
-                   cls.loop_decl,
-            m.Try: \
-                cls.try_decl,
-            m.Catch: \
-                cls.try_decl,
-            m.ConstructorInvocation: \
-                cls.const_invoc,
-            m.InstanceCreation : \
-                cls.inst_invoc,
-            m.ExpressionStatement: \
-                cls.expr_decl,
-            m.Assignment: \
-                cls.assign_decl,
+            m.ClassInitializer: cls.cls_init,
+            m.VariableDeclaration:
+            cls.var_decl,
+            m.Conditional:
+            cls.condition_decl,
+            m.Block:
+            cls.block_decl,
+            m.ArrayInitializer:
+            cls.array_decl,
+            m.MethodInvocation:
+            cls.method_invoc,
+            m.IfThenElse:
+            cls.cond_decl,
+            m.While:
+            cls.loop_decl,
+            m.For:
+            cls.loop_decl,
+            m.ForEach:
+            cls.loop_decl,
+            m.Switch:
+            cls.switch_decl,
+            m.SwitchCase:
+            cls.switch_decl,
+            m.DoWhile:
+            cls.loop_decl,
+            m.Try:
+            cls.try_decl,
+            m.Catch:
+            cls.try_decl,
+            m.ConstructorInvocation:
+            cls.const_invoc,
+            m.InstanceCreation:
+            cls.inst_invoc,
+            m.ExpressionStatement:
+            cls.expr_decl,
+            m.Assignment:
+            cls.assign_decl,
             m.Return:
                 cls.return_decl
-            }       
-            
+        }
+
         for statement in method_decl.body:
             for kk, vv in function_handling.items():
                 if type(statement) is kk:
                     statement_types.append(
                         statement)
                     methods += \
-                       vv(statement, \
-                          function_handling)
+                        vv(statement,
+                           function_handling)
         return methods, statement_types
 
     @classmethod
@@ -183,10 +183,10 @@ class Node:
             for bstatement in s.block:
                 for kk, vv in f.items():
                     if type(bstatement) \
-                         is kk:
+                            is kk:
                         methods += vv(bstatement, f)
         return methods
-    
+
     @classmethod
     def var_decl(cls, s, f):
         methods = []
@@ -197,33 +197,33 @@ class Node:
         ms = []
         for vv in s.variable_declarators:
             if type(vv) \
-                is m.VariableDeclarator:
+                    is m.VariableDeclarator:
                 vname = obj_handler(vv.variable)
                 vs.append((vtype, vname))
             if type(vv.initializer) \
-                 is m.MethodInvocation:
+                    is m.MethodInvocation:
                 ms.append((type(vv.initializer),
-                         obj_handler(
-                       vv.initializer)))
+                           obj_handler(
+                    vv.initializer)))
             elif type(vv.initializer) \
-                  is m.InstanceCreation:
+                    is m.InstanceCreation:
                 ms.append((type(vv.initializer),
-                         obj_handler(
-                       vv.initializer.type)))
+                           obj_handler(
+                    vv.initializer.type)))
         methods.append((vs, ms))
         return methods
-                  
+
     def condition_decl(cls, s, f):
         print("Conditional", s)
         return []
-    
+
     @classmethod
     def cast_decl(cls, s, f):
         methods = []
         if not hasattr(s, 'target'):
-           return methods
+            return methods
         if s.target is None:
-           return methods
+            return methods
         for kk, vv in f.items():
             if type(s.target) is kk:
                 methods = vv(s.target, f)
@@ -237,6 +237,7 @@ class Node:
                 if type(bstatement) is kk:
                     methods += vv(bstatement, f)
         return methods
+
     @classmethod
     def array_decl(cls, s, f):
         print("Array", s)
@@ -251,24 +252,24 @@ class Node:
         if hasattr(s, 'target'):
             if s.target is not None:
                 vs.append((type(s.target),
-                   obj_handler(s.target)))
+                           obj_handler(s.target)))
         methods.append((vs, ms))
         return methods
-                          
+
     @classmethod
     def cond_decl(cls, s, f):
         methods = []
         for kk, vv in f.items():
             if type(s.if_true) is \
-                 kk:
+                    kk:
                 methods += \
-                  vv(s.if_true, f)
+                    vv(s.if_true, f)
             if type(s.if_false) is \
-                 kk:
+                    kk:
                 methods += \
-                  vv(s.if_false, f)
+                    vv(s.if_false, f)
         return methods
-    
+
     @classmethod
     def loop_decl(cls, s, f):
         methods = []
@@ -285,19 +286,19 @@ class Node:
 
     @classmethod
     def try_decl(cls, s, f):
-        #print(s)
+        # print(s)
         methods = []
         if s.block is None:
             return methods
 
         for kk, vv in f.items():
-           if type(s.block) is kk:
-              methods += vv(s.block, f)
+            if type(s.block) is kk:
+                methods += vv(s.block, f)
         return methods
 
     @classmethod
     def switch_decl(cls, s, f):
-        #print("Switch", s)
+        # print("Switch", s)
         return []
 
     @classmethod
@@ -315,9 +316,10 @@ class Node:
         for kk, vv in f.items():
             for ss in s.body:
                 if type(ss) is kk:
-                     methods += \
-                       vv(ss, f)
+                    methods += \
+                        vv(ss, f)
         return methods
+
     @classmethod
     def expr_decl(cls, s, f):
         methods = []
@@ -325,26 +327,26 @@ class Node:
             if type(s.expression) is kk:
                 methods = vv(s.expression, f)
         return methods
-    
+
     @classmethod
     def assign_decl(cls, s, f):
         methods = []
         ms = []
         vs = []
         if s.lhs is not None:
-            vs.append((None, 
-               obj_handler(s.lhs)))
+            vs.append((None,
+                       obj_handler(s.lhs)))
         if s.rhs is not None:
             if type(s.rhs) \
-                 is m.MethodInvocation:
+                    is m.MethodInvocation:
                 ms.append((type(s.rhs),
-                         obj_handler(
-                       s.rhs)))
+                           obj_handler(
+                    s.rhs)))
             elif type(s.rhs) \
-                  is m.InstanceCreation:
-                 ms.append((type(s.rhs),
-                         obj_handler(
-                       s.rhs.type)))
+                    is m.InstanceCreation:
+                ms.append((type(s.rhs),
+                           obj_handler(
+                    s.rhs.type)))
         methods.append((vs, ms))
         return methods
 
@@ -357,15 +359,16 @@ class Node:
         if type(stype) is \
            m.MethodInvocation:
             ms.append((type(stype),
-                   obj_handler(
-                   stype)))
+                       obj_handler(
+                stype)))
         elif type(stype) \
-              is m.InstanceCreation:
+                is m.InstanceCreation:
             ms.append((type(stype),
-                         obj_handler(
+                       obj_handler(
                        stype.type)))
         methods.append((vs, ms))
         return methods
+
 
 def obj_handler(obj):
     if type(obj) is str:
