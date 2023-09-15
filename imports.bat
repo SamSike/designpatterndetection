@@ -19,13 +19,12 @@ for %%X in (
     argparse
     traceback
     subprocess
+
+    git+https://github.com/musiKk/plyj
 ) do (
     echo Installing %%X
     pip install %%X
+    echo Upgrading %%X
+    pip install -U %%X
     echo .
 )
-
-echo Installing plyj
-git clone https://github.com/musiKk/plyj
-cd plyj/
-python setup.py build
