@@ -10,7 +10,7 @@ for %%X in (
     logging
     tqdm
     numpy
-    plyj
+    ply
     seaborn
     matplotlib
     pandas
@@ -24,3 +24,8 @@ for %%X in (
     pip install %%X
     echo .
 )
+
+echo Installing plyj
+git clone https://github.com/musiKk/plyj
+cd plyj/
+python setup.py build
