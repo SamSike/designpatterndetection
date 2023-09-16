@@ -119,7 +119,7 @@ def logistic():
 
 
 def ridge():
-    return RidgeClassifier(alpha=0.3, normalize=True, class_weight="balanced")
+    return RidgeClassifier(alpha=0.3, class_weight="balanced")
 
 
 def svm():
