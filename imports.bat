@@ -1,6 +1,10 @@
 @echo off
 :: This file installs all required modules/frameworks 
 :: that this project uses/requires
+:: Ensure python is installed
+
+python -m pip install --upgrade pip
+
 for %%X in (
     sys
     os

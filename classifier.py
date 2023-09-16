@@ -1,3 +1,4 @@
+import warnings
 import seaborn as sns
 from matplotlib import pyplot as plt  # Used for plotting
 import pandas as pd
@@ -7,7 +8,7 @@ from sklearn.svm import SVC
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import precision_recall_fscore_support
-from sklearn.linear_model import RandomizedLogisticRegression, LogisticRegression, RidgeClassifier
+from sklearn.linear_model import LogisticRegression, RidgeClassifier
 from sklearn.metrics import balanced_accuracy_score
 from sklearn.model_selection import StratifiedKFold
 from sklearn.ensemble import GradientBoostingClassifier
@@ -26,6 +27,8 @@ import re
 import matplotlib
 matplotlib.rcParams['backend'] = 'TkAgg'
 
+# Disable Future Warnings
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
 # initialization of the RNG
 np.random.seed(2016)
@@ -40,8 +43,8 @@ assert algorithm in ["RF", "SVM", "GBTREE", "ADABOOST",
 print("Algorithm Used = %s" % (algorithm))
 
 # Filename of the dataset
-# data_file = "dataset.csv"
-data_file = "P-MARt-dataset.csv"
+data_file = "dataset.csv"
+# data_file = "P-MARt-dataset.csv"
 
 # Read data from a csv file into a pandas dataframe
 data = pd.read_csv(data_file)
@@ -80,7 +83,7 @@ def train_test_get_metrics(model_builder, X_train, X_test, y_train, y_test):
     model.fit(X_train, y_train)  # .astype(float)
     y_pred = model.predict(X_test)
     cm = confusion_matrix(
-        label_lookup[y_test], label_lookup[y_pred], label_lookup)
+        y_true=label_lookup[y_test], y_pred=label_lookup[y_pred], labels=label_lookup)
     accuracy = np.trace(cm) / float(np.sum(cm))
     misclassification = 1 - accuracy
     precision, recall, fscore, support = precision_recall_fscore_support(
@@ -199,7 +202,7 @@ cm, accuracy, balanced_accuracy, misclassification, precision, recall, fscore, s
     cv_results)
 
 # Save the confusion matrix to file
-with open("results/confusion_matrix_%s.csv" % (algorithm), "w") as f:
+with open("results/%s/confusion_matrix_%s.csv" % (algorithm, algorithm), "w") as f:
     ordered_patterns = []
     for i in range(len(cm[0])):
         ordered_patterns.append(label_lookup[i])
@@ -226,7 +229,8 @@ ax1.set_title("Precision = %2.2f%%  Recall = %.2f%%" %
 ax1.set_xlabel("Design Pattern")
 ax1.set_ylabel("Precision & Recall")
 plt.xticks(rotation=45, ha="right")
-plt.savefig("results/%s Precision-Recall Scores" % (algorithm))
+plt.savefig("results/%s/%s Precision-Recall Scores" %
+            (algorithm, algorithm))
 plt.show()
 
 cmap = plt.get_cmap('Blues')  # Colour scheme
@@ -267,11 +271,11 @@ for i in range(len(cm[0])):
 # Uncomment below line to add title to plot
 # ax.set_title("Design Pattern %s Classification Confusion Matrix"%(algorithm))
 fig.tight_layout()
-plt.savefig("results/%s Classification" % (algorithm))
+plt.savefig("results/%s/%s Classification" % (algorithm, algorithm))
 plt.show()
 # ---------------------------------------------------------#
 
 classification_report_df = pd.DataFrame(
     {"labels": label_lookup, "precision": precision, "recall": recall, "fscore": fscore, "support": support})
 classification_report_df.to_csv(
-    "results/evaluation_%s.csv" % (algorithm), index=False)
+    "results/%s/evaluation_%s.csv" % (algorithm, algorithm), index=False)

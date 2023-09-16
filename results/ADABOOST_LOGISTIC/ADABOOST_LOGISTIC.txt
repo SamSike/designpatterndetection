@@ -1,0 +1,17 @@
+Algorithm Used = ADABOOST_LOGISTIC
+pattern
+Facade             101
+Observer           100
+Decorator          100
+Proxy               99
+Adapter             99
+Builder             98
+FactoryMethod       98
+Memento             98
+Prototype           97
+Singleton           97
+Visitor             94
+AbstractFactory     89
+Name: count, dtype: int64
+Shape before filtering of data:  (1270, 115)
+Shape after filtering of data:  (1170, 115)
